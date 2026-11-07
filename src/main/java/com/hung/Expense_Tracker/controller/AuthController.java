@@ -1,5 +1,7 @@
 package com.hung.Expense_Tracker.controller;
 
+import com.hung.Expense_Tracker.dto.AuthResponse;
+import com.hung.Expense_Tracker.dto.LoginRequest;
 import com.hung.Expense_Tracker.dto.RegisterRequest;
 import com.hung.Expense_Tracker.dto.UserResponse;
 import com.hung.Expense_Tracker.service.AuthService;
@@ -23,5 +25,10 @@ public class AuthController {
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         UserResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 }
