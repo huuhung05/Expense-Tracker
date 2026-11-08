@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -36,4 +37,20 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @EntityGraph(attributePaths = "category")
     Optional<Transaction> findByIdAndUserId(Long id, Long userId);
+
+    @Query("""
+            SELECT COALESCE(SUM(t.amount), 0)
+            FROM Transaction t
+            WHERE t.user.id = :userId
+              AND t.category.id = :categoryId
+              AND t.type = :type
+              AND t.transactionDate BETWEEN :startDate AND :endDate
+            """)
+    BigDecimal sumAmountByUserAndCategoryAndDateRange(
+            @Param("userId") Long userId,
+            @Param("categoryId") Long categoryId,
+            @Param("type") TransactionType type,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 }
