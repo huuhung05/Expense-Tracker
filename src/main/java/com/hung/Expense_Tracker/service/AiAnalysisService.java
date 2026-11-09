@@ -34,7 +34,12 @@ public class AiAnalysisService {
 
     public AiAnalysisService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.restClient = RestClient.builder().build();
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(java.time.Duration.ofSeconds(5));
+        factory.setReadTimeout(java.time.Duration.ofSeconds(15));
+        this.restClient = RestClient.builder()
+                .requestFactory(factory)
+                .build();
     }
 
     public AiAnalysisResponse analyzeSpending(MonthlySummaryResponse summary) {
