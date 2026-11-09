@@ -1,5 +1,6 @@
 package com.hung.Expense_Tracker.repository;
 
+import com.hung.Expense_Tracker.dto.CategorySummary;
 import com.hung.Expense_Tracker.entity.Transaction;
 import com.hung.Expense_Tracker.entity.TransactionType;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -49,6 +51,41 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     BigDecimal sumAmountByUserAndCategoryAndDateRange(
             @Param("userId") Long userId,
             @Param("categoryId") Long categoryId,
+            @Param("type") TransactionType type,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(t.amount), 0)
+            FROM Transaction t
+            WHERE t.user.id = :userId
+              AND t.type = :type
+              AND t.transactionDate BETWEEN :startDate AND :endDate
+            """)
+    BigDecimal sumAmountByUserAndTypeAndDateRange(
+            @Param("userId") Long userId,
+            @Param("type") TransactionType type,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("""
+            SELECT new com.hung.Expense_Tracker.dto.CategorySummary(
+                t.category.id,
+                t.category.name,
+                SUM(t.amount),
+                COUNT(t.id)
+            )
+            FROM Transaction t
+            WHERE t.user.id = :userId
+              AND t.type = :type
+              AND t.transactionDate BETWEEN :startDate AND :endDate
+            GROUP BY t.category.id, t.category.name
+            ORDER BY SUM(t.amount) DESC
+            """)
+    List<CategorySummary> findCategorySummaries(
+            @Param("userId") Long userId,
             @Param("type") TransactionType type,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
