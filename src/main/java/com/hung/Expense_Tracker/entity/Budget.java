@@ -9,10 +9,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-    name = "budgets",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "category_id", "month", "year"})
-)
+@Table(name = "budgets", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "category_id", "month",
+        "year" }))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,8 +36,7 @@ public class Budget {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name =
-            "category_id", nullable = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @CreationTimestamp

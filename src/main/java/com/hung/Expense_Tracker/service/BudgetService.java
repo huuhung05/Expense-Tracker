@@ -143,9 +143,14 @@ public class BudgetService {
 
         BigDecimal limitAmount = budget.getAmount();
         BigDecimal remainingAmount = limitAmount.subtract(spentAmount);
-        BigDecimal usagePercentage = spentAmount
-                .multiply(BigDecimal.valueOf(100))
-                .divide(limitAmount, 2, RoundingMode.HALF_UP);
+
+        // Guard against division by zero when limitAmount = 0
+        BigDecimal usagePercentage = BigDecimal.ZERO;
+        if (limitAmount.compareTo(BigDecimal.ZERO) > 0) {
+            usagePercentage = spentAmount
+                    .multiply(BigDecimal.valueOf(100))
+                    .divide(limitAmount, 2, RoundingMode.HALF_UP);
+        }
         boolean exceeded = spentAmount.compareTo(limitAmount) > 0;
 
         return new BudgetResponse(
